@@ -1,0 +1,9 @@
+{
+    "port": 11000,
+    "rate_limiting": {
+        "enabled": true,
+        "time": 60,
+        "requests": 40
+    },
+    "server_location": "http://localhost:11000"
+}

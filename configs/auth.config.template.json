@@ -1,0 +1,5 @@
+{
+    "mongo": {
+        "database_connection_string": "mongodb+srv://<databaseUser>:<password>@<url>/<database>?retryWrites=true&w=majority"
+    }
+}
