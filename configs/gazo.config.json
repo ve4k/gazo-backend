@@ -5,5 +5,13 @@
         "time": 60,
         "requests": 40
     },
-    "server_location": "http://localhost:11000"
+    "server_location": "http://localhost:11000",
+    "cache_time": 30,
+    "logging": true,
+    "purging": {
+        "redis": true,
+        "mongodb": false,
+        "uploads": false,
+        "logs": false
+    }
 }
