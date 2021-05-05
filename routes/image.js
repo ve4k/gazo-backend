@@ -71,7 +71,7 @@ router.get('/:name', async (req, res) => {
     <meta content="${gazo_config.server_location}/image/raw/${name}" property="og:image">
     <img src="${gazo_config.server_location}/image/raw/${name}" />
     <hr>
-    <p>github.com/ve4k/gazo-backend</p>
+    <p>${name}</p>
     `
     res.send(htmlToSend)
 })
