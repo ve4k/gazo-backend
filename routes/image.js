@@ -54,9 +54,7 @@ router.get('/:name', (req, res) => {
             new Magic(mmm.MAGIC_MIME_TYPE).detect(Buffer.from(data.toString(), 'base64'), (err, result) => {
                 if (err) throw err
                 res.contentType(result)
-                console.log(result)
                 res.send(Buffer.from(data.toString(), 'base64'))
-                console.log("Sent from Redis")
                 foundRedis = true
             })
             return
@@ -101,7 +99,7 @@ router.post('/new', ensureUploadAuthenticated, upload.single('image'), (req, res
             return
         }
         const buffer = Buffer.from(fs.readFileSync(req.file.path))
-        client.set(img.name, buffer.toString('base64'), 
+        client.setex(img.name, 5, buffer.toString('base64'), 
         (err, callback) => { 
             if(err) { 
                 res.status(500)
