@@ -61,54 +61,16 @@ router.get('/', (req, res) => {
 
 router.get('/:name', async (req, res) => {
     const name = req.params.name
-    var foundRedis = false
-    client.get(name, function(err, data) {
-        if(err) {
-            console.error(err)
-            res.status(500)
-            res.send("Internal Server Error")
-            return 
-        }
-        if(data != null) {
-            new Magic(mmm.MAGIC_MIME_TYPE).detect(Buffer.from(data.toString(), 'base64'), (err, result) => {
-                if (err) throw err
-                var htmlToSend = `
-                <link rel="stylesheet" href="${gazo_config.server_location}/stylesheet" />
-                <meta content="#1122ff" property="theme-color">
-                <meta content="${gazo_config.server_location}/image/raw/" property="og:image">
-                <meta property="twitter:card" content="${gazo_config.server_location}/image/raw/${name}">
-                <img src="${gazo_config.server_location}/image/raw/${name}" />
-                <hr>
-                <p>github.com/ve4k/gazo-backend&#x1F4A8;</p>
-                `
-                res.send(htmlToSend)
-                log("Sent content from redis to " + req.ip)
-                foundRedis = true
-            })
-            return
-        }
-    })
-    await Image.findOne({ name: name }, (err, docs) => {
-        if (foundRedis)
-            return
-        if(err) {
-            console.log(err)
-            return err
-        }
-        log("Sent raw content from mongodb to " + req.ip)
-        var nm = docs.name
-        console.log(nm)
-        var htmlToSend = `
-        <link rel="stylesheet" href="${gazo_config.server_location}/stylesheet" />
-        <meta content="#1122ff" property="theme-color">
-        <meta content="${gazo_config.server_location}/image/raw/${nm}" property="og:image">
-        <meta property="twitter:card" content="${gazo_config.server_location}/image/raw/${nm}">
-        <img src="${gazo_config.server_location}/image/raw/${nm}" />
-        <hr>
-        <p>github.com/ve4k/gazo-backend</p>
-        `
-        res.send(htmlToSend)
-    })
+    log("Sent embedded content to " + req.ip)
+    var htmlToSend = `
+    <link rel="stylesheet" href="${gazo_config.server_location}/stylesheet" />
+    <meta content="#1122ff" property="theme-color">
+    <meta content="${gazo_config.server_location}/image/raw/${name}" property="og:image">
+    <img src="${gazo_config.server_location}/image/raw/${name}" />
+    <hr>
+    <p>github.com/ve4k/gazo-backend</p>
+    `
+    res.send(htmlToSend)
 })
 
 router.get('/raw/:name', (req, res) => {
