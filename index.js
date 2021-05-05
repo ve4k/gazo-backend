@@ -3,12 +3,14 @@ const express = require('express')
 const mongoose = require('mongoose')
 const rateLimiter = require('express-rate-limit')
 const userAgent = require('express-useragent')
+const redis = require('redis')
 
 const auth_config = require('./configs/auth.config.json')
 const gazo_config = require('./configs/gazo.config.json')
 
 const app = express()
-
+const client = redis.createClient()
+module.exports.client = client
 const rateLimit = rateLimiter({
     max: gazo_config.rate_limiting.requests,
     windowMs: gazo_config.rate_limiting.time * 1000,
@@ -16,6 +18,9 @@ const rateLimit = rateLimiter({
 })
 
 app.use(userAgent.express())
+client.on("error", function(error) {
+    console.error(error);
+});
 
 if (gazo_config.rate_limiting.enabled) {
     app.use(rateLimit)

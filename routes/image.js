@@ -4,6 +4,8 @@ const fs = require('fs')
 const Image = require('../models/Image')
 const gazo_config = require('../configs/gazo.config.json')
 const mime = require('mime-types')
+const redis = require('redis')
+const client = require('../index').client
 
 const getDirSize = function(dirPath) {
     files = fs.readdirSync(dirPath)
@@ -39,6 +41,11 @@ router.get('/', (req, res) => {
 
 router.get('/:name', (req, res) => {
     const name = req.params.name
+    client.get(name, function(err, data) {
+        console.log('data: ' + data)
+        if(err) console.error(err)
+        if(data != null)  {res.send(data);return}
+    })
     Image.findOne({ name: name }, (err, docs) => {
         if(err) {
             console.log(err)
@@ -76,6 +83,8 @@ router.post('/new', ensureUploadAuthenticated, upload.single('image'), (req, res
         }
         if(req.useragent.source.startsWith('ShareX')) {
             res.json({ "success": true, "url": gazo_config.server_location + "/image/" + img.name })
+            console.log(req.file)
+            client.set(img.name, fs.readFileSync(req.file.path), function(callback){console.log(callback)})
         } else {
             res.send(gazo_config.server_location + "/image/" + img.name)
         }
