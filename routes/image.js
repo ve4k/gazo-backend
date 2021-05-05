@@ -6,6 +6,7 @@ const gazo_config = require('../configs/gazo.config.json')
 const mime = require('mime-types')
 const redis = require('redis')
 const client = require('../index').client
+const mmm = require("mmmagic"), Magic = mmm.Magic
 
 const getDirSize = function(dirPath) {
     files = fs.readdirSync(dirPath)
@@ -19,10 +20,10 @@ const getDirSize = function(dirPath) {
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './uploads');
+        cb(null, './uploads')
     },
     filename: function(req, file, cb) {
-        cb(null, new Date().getTime() + file.originalname);
+        cb(null, new Date().getTime() + file.originalname)
     }
 })
 
@@ -41,16 +42,34 @@ router.get('/', (req, res) => {
 
 router.get('/:name', (req, res) => {
     const name = req.params.name
+    var foundRedis = false
     client.get(name, function(err, data) {
-        console.log('data: ' + data)
-        if(err) console.error(err)
-        if(data != null)  {res.send(data);return}
+        if(err) {
+            console.error(err)
+            res.status(500)
+            res.send("Internal Server Error")
+            return 
+        }
+        if(data != null) {
+            new Magic(mmm.MAGIC_MIME_TYPE).detect(Buffer.from(data.toString(), 'base64'), (err, result) => {
+                if (err) throw err
+                res.contentType(result)
+                console.log(result)
+                res.send(Buffer.from(data.toString(), 'base64'))
+                console.log("Sent from Redis")
+                foundRedis = true
+            })
+            return
+        }
     })
     Image.findOne({ name: name }, (err, docs) => {
+        if (foundRedis)
+            return
         if(err) {
             console.log(err)
             return err
         }
+        console.log("Sent from MongoDB database")
         res.contentType(mime.lookup(docs.path.split('.')[docs.path.split('.').length - 1]))
         res.send(fs.readFileSync("./uploads/" + docs.path))
     })
@@ -67,13 +86,13 @@ function ensureUploadAuthenticated(req, res, next) {
 router.post('/new', ensureUploadAuthenticated, upload.single('image'), (req, res) => {
     if(req.file === null) {
         res.status(400)
-        res.send('No image')
+        return res.send('No image')
     }
     if(req.file.filename === null) {
         res.status(400)
-        res.send('No image')
+        return res.send('No image')
     }
-    const image = new Image;
+    const image = new Image
     image.path = req.file.filename
     image.save((err, img) => {
         if(err) {
@@ -81,10 +100,17 @@ router.post('/new', ensureUploadAuthenticated, upload.single('image'), (req, res
             res.send("gazo.host error")
             return
         }
+        const buffer = Buffer.from(fs.readFileSync(req.file.path))
+        client.set(img.name, buffer.toString('base64'), 
+        (err, callback) => { 
+            if(err) { 
+                res.status(500)
+                res.send("Internal Server Error")
+                return 
+            } 
+        })
         if(req.useragent.source.startsWith('ShareX')) {
             res.json({ "success": true, "url": gazo_config.server_location + "/image/" + img.name })
-            console.log(req.file)
-            client.set(img.name, fs.readFileSync(req.file.path), function(callback){console.log(callback)})
         } else {
             res.send(gazo_config.server_location + "/image/" + img.name)
         }

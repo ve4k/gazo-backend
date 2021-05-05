@@ -1,4 +1,9 @@
-// Styling "documentation" in how-to-write-your-code.md
+/*
+write your JS like this:
+(arg1, arg2) => { ... }
+not like this:
+function (arg1, arg2) { ... }
+*/
 const express = require('express')
 const mongoose = require('mongoose')
 const rateLimiter = require('express-rate-limit')
@@ -14,12 +19,12 @@ module.exports.client = client
 const rateLimit = rateLimiter({
     max: gazo_config.rate_limiting.requests,
     windowMs: gazo_config.rate_limiting.time * 1000,
-    handler: (req, res) => { res.status(429); res.send("get rate limited noob")}
+    handler: (req, res) => { res.status(429); res.send("You are rate limited.") }
 })
 
 app.use(userAgent.express())
 client.on("error", function(error) {
-    console.error(error);
+    console.error(error)
 });
 
 if (gazo_config.rate_limiting.enabled) {
