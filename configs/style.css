@@ -1,0 +1,12 @@
+* {
+    background-color: #181818;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: x-large;
+}
+
+img {
+    margin: 0.25rem;
+    border: 1px solid #282828; 
+    outline: 1px solid #080808;
+}

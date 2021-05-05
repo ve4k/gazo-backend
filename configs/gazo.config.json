@@ -5,13 +5,12 @@
         "time": 60,
         "requests": 40
     },
-    "server_location": "http://localhost:11000",
+    "server_location": "https://bd15e0f61a5f.ngrok.io",
     "cache_time": 30,
     "logging": true,
     "purging": {
         "redis": true,
         "mongodb": false,
-        "uploads": false,
-        "logs": false
+        "uploads": false
     }
 }

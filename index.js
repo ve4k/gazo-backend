@@ -43,10 +43,6 @@ if(gazo_config.purging.redis) {
     client.flushdb((err) => { if(err) { console.log("Error purging redis."); throw err } console.log("Cleared redis database.") })
 }
 
-if(gazo_config.purging.mongodb) {
-    Image.deleteMany({}, (err) => { if(err) { console.log("Error purging mongodb."); throw err } console.log("Cleared MongoDB database.") })
-}
-
 if(gazo_config.purging.uploads) {
     const uploads = fs.readdirSync("./uploads")
     for (let i = 0; i < uploads.length; i++) {
@@ -77,6 +73,8 @@ const authRoute = require('./routes/auth')
 
 app.use('/image', imageRoute)
 app.use('/user/auth', authRoute)
+
+app.get('/stylesheet', (req, res) => res.send(fs.readFileSync("./configs/style.css")))
 
 // mongodb | Make sure to URL encode your password in the database connection string.
 mongoose.connect(auth_config.mongo.database_connection_string, { useNewUrlParser: true, useUnifiedTopology: true }, () => {
