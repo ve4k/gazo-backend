@@ -1,3 +1,5 @@
 configs/auth.config.json
 node_modules/
 package-lock.json
+uploads/*
+!uploads/NOTE.md
