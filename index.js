@@ -24,6 +24,14 @@ const rateLimit = rateLimiter({
     handler: (req, res) => { res.status(429); res.send("You are rate limited.") }
 })
 
+if(gazo_config.purging.logs) {
+    const logs = fs.readdirSync("./logs")
+    for (let i = 0; i < logs.length; i++) {
+        const content = logs[i]
+        fs.unlinkSync("./logs/" + content)
+    }
+}
+
 if(gazo_config.logging) {
     const logDate = new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDay() + "-" + new Date().getHours() + "." + new Date().getMinutes() + "." + new Date().getSeconds() + "." + new Date().getMilliseconds()
     const currLogFile = logDate + '-gazo-log.txt'
@@ -45,14 +53,6 @@ if(gazo_config.purging.uploads) {
         const content = uploads[i]
         if(content != "NOTE.md")
             fs.unlinkSync("./uploads/" + content)
-    }
-}
-
-if(gazo_config.purging.logs) {
-    const logs = fs.readdirSync("./logs")
-    for (let i = 0; i < logs.length; i++) {
-        const content = logs[i]
-        fs.unlinkSync("./logs/" + content)
     }
 }
 
