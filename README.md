@@ -1,2 +1,6 @@
 # gazo-backend
-backend for my new shitty image host
+
+List of things to add to the application:
+* Redis cache
+* User auth
+* Features for chat apps (embeds, Link spoofing)
