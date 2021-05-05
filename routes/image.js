@@ -63,6 +63,7 @@ router.get('/:name', async (req, res) => {
     const name = req.params.name
     log("Sent embedded content to " + req.ip)
     var htmlToSend = `
+    <meta content="${gazo_config.site_name}" property="og:description">
     <link rel="stylesheet" href="${gazo_config.server_location}/stylesheet" />
     <meta content="#1122ff" property="theme-color">
     <meta content="${gazo_config.server_location}/image/raw/${name}" property="og:image">
@@ -73,7 +74,7 @@ router.get('/:name', async (req, res) => {
     res.send(htmlToSend)
 })
 
-router.get('/raw/:name', (req, res) => {
+router.get('/raw/:name', async (req, res) => {
     const name = req.params.name
     var foundRedis = false
     client.get(name, function(err, data) {
@@ -92,18 +93,18 @@ router.get('/raw/:name', (req, res) => {
                 foundRedis = true
             })
             return
+        } else {
+            Image.findOne({ name: name }, (err, docs) => {
+                if (foundRedis)
+                    return
+                if(err || !docs) {
+                    return res.send("No image found")
+                }
+                log("Sent raw content from mongodb to " + req.ip)
+                res.contentType(mime.lookup(docs.path.split('.')[docs.path.split('.').length - 1]))
+                res.send(fs.readFileSync("./uploads/" + docs.path))
+            })
         }
-    })
-    Image.findOne({ name: name }, (err, docs) => {
-        if (foundRedis)
-            return
-        if(err) {
-            console.log(err)
-            return err
-        }
-        log("Sent raw content from mongodb to " + req.ip)
-        res.contentType(mime.lookup(docs.path.split('.')[docs.path.split('.').length - 1]))
-        res.send(fs.readFileSync("./uploads/" + docs.path))
     })
 })
 
