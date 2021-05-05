@@ -4,19 +4,21 @@ const fs = require('fs')
 const Image = require('../models/Image')
 const gazo_config = require('../configs/gazo.config.json')
 const mime = require('mime-types')
-const redis = require('redis')
 const client = require('../index').client
 const mmm = require("mmmagic"), Magic = mmm.Magic
 
-const getDirSize = function(dirPath) {
-    files = fs.readdirSync(dirPath)
-    dirSize = 0
-    files.forEach(() => {
-        dirSize++
-    })
-    console.log(dirSize)
-    return dirSize
- }
+const logDate = new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDay() + "-" + new Date().getHours() + "." + new Date().getMinutes() + "." + new Date().getSeconds() + "." + new Date().getMilliseconds()
+const currLogFile = logDate + '-gazo-log.txt'
+function log(content) {
+    if(gazo_config.logging) {
+        fs.appendFile('./logs/' + currLogFile, "[" + new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds() + "] " + content + "\n", (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("[" + new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds() + "] Logged event.");
+        });
+    }
+}
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -55,6 +57,7 @@ router.get('/:name', (req, res) => {
                 if (err) throw err
                 res.contentType(result)
                 res.send(Buffer.from(data.toString(), 'base64'))
+                log("Sent content from redis to " + req.ip)
                 foundRedis = true
             })
             return
@@ -67,7 +70,7 @@ router.get('/:name', (req, res) => {
             console.log(err)
             return err
         }
-        console.log("Sent from MongoDB database")
+        log("Sent content from mongodb to " + req.ip)
         res.contentType(mime.lookup(docs.path.split('.')[docs.path.split('.').length - 1]))
         res.send(fs.readFileSync("./uploads/" + docs.path))
     })
@@ -99,7 +102,7 @@ router.post('/new', ensureUploadAuthenticated, upload.single('image'), (req, res
             return
         }
         const buffer = Buffer.from(fs.readFileSync(req.file.path))
-        client.setex(img.name, 5, buffer.toString('base64'), 
+        client.setex(img.name, gazo_config.cache_time, buffer.toString('base64'), 
         (err, callback) => { 
             if(err) { 
                 res.status(500)
@@ -112,6 +115,7 @@ router.post('/new', ensureUploadAuthenticated, upload.single('image'), (req, res
         } else {
             res.send(gazo_config.server_location + "/image/" + img.name)
         }
+        log("Uploaded image from " + req.ip)
     })
 })
 
