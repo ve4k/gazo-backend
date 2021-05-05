@@ -1,4 +1,5 @@
 configs/auth.config.json
+configs/gazo.config.json
 node_modules/
 package-lock.json
 uploads/*

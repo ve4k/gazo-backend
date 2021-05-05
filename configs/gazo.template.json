@@ -5,10 +5,10 @@
         "time": 60,
         "requests": 40
     },
-    "server_location": "https://bd15e0f61a5f.ngrok.io",
+    "server_location": "http://localhost:11000",
     "cache_time": 60,
     "logging": true,
-    "site_name": "welcome to tech support",
+    "site_name": "gazo.host",
     "purging": {
         "redis": true,
         "mongodb": false,

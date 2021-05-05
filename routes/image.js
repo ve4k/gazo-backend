@@ -63,7 +63,9 @@ router.get('/:name', async (req, res) => {
     const name = req.params.name
     log("Sent embedded content to " + req.ip)
     var htmlToSend = `
-    <meta content="${gazo_config.site_name}" property="og:description">
+    <title>${gazo_config.site_name}</title>
+    <meta content="${gazo_config.site_name}" property="og:title">
+    <meta content="${name}" property="og:description">
     <link rel="stylesheet" href="${gazo_config.server_location}/stylesheet" />
     <meta content="#1122ff" property="theme-color">
     <meta content="${gazo_config.server_location}/image/raw/${name}" property="og:image">
