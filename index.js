@@ -16,7 +16,7 @@ const auth_config = require('./configs/auth.config.json')
 const gazo_config = require('./configs/gazo.config.json')
 
 const app = express()
-const client = redis.createClient()
+const client = redis.createClient(auth_config.redis)
 module.exports.client = client
 const rateLimit = rateLimiter({
     max: gazo_config.rate_limiting.requests,
@@ -74,7 +74,8 @@ const authRoute = require('./routes/auth')
 app.use('/image', imageRoute)
 app.use('/user/auth', authRoute)
 
-app.get('/stylesheet', (req, res) => res.send(fs.readFileSync("./configs/style.css")))
+app.get('/stylesheet', (req, res) => res.send(fs.readFileSync("./static/style.css")))
+app.get('/privacy', (req, res) => res.send(fs.readFileSync("./static/privacy.md")))
 
 // mongodb | Make sure to URL encode your password in the database connection string.
 mongoose.connect(auth_config.mongo.database_connection_string, { useNewUrlParser: true, useUnifiedTopology: true }, () => {

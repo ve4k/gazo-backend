@@ -69,7 +69,7 @@ router.get('/:name', async (req, res) => {
     <link rel="stylesheet" href="${gazo_config.server_location}/stylesheet" />
     <meta content="#1122ff" property="theme-color">
     <meta content="${gazo_config.server_location}/image/raw/${name}" property="og:image">
-    <img src="${gazo_config.server_location}/image/raw/${name}" />
+    <a href="${gazo_config.server_location}/image/raw/${name}" target="_blank"><img src="${gazo_config.server_location}/image/raw/${name}" /></a>
     <hr>
     <p>${name}</p>
     `
@@ -79,7 +79,7 @@ router.get('/:name', async (req, res) => {
 router.get('/raw/:name', async (req, res) => {
     const name = req.params.name
     var foundRedis = false
-    client.get(name, function(err, data) {
+    client.get(name, (err, data) => {
         if(err) {
             console.error(err)
             res.status(500)
