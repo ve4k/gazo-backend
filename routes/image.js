@@ -70,6 +70,7 @@ router.get('/:name', async (req, res) => {
     <meta content="#1122ff" property="theme-color">
     <meta content="${gazo_config.server_location}/image/raw/${name}" property="og:image">
     <a href="${gazo_config.server_location}/image/raw/${name}" target="_blank"><img src="${gazo_config.server_location}/image/raw/${name}" /></a>
+    <a className="sizeWarn" href="${gazo_config.server_location}/image/raw/${name}" target="_blank">View image</p>
     <hr>
     <p>${name}</p>
     `

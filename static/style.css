@@ -23,3 +23,16 @@ img {
     border: 1px solid #282828; 
     outline: 1px solid #080808;
 }
+
+.sizeWarn {
+    display: none;
+}
+
+@media screen and (max-width: 1000px) {
+    img {
+        display: none;
+    }
+    .sizeWarn {
+        display: contents;
+    }
+}
